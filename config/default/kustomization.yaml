@@ -1,0 +1,12 @@
+resources:
+- ../default
+- ../manager
+- ../rbac
+
+images:
+- name: controller
+  newName: pia-operator
+  newTag: latest
+
+patchesStrategicMerge:
+- manager_auth_proxy_patch.yaml

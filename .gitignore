@@ -1,0 +1,141 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+dist/
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+vendor/
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Build artifacts
+*.o
+*.a
+*.so
+
+# Coverage reports
+coverage.txt
+coverage.html
+*.coverprofile
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.tmp
+*.temp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Log files
+*.log
+logs/
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Kubernetes specific
+kubeconfig
+*.kubeconfig
+config/manager/kustomization.yaml
+
+# TLS certificates
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
+
+# Operator SDK specific
+bundle/
+bundle.Dockerfile
+
+# Helm charts
+charts/*.tgz
+
+# Docker
+Dockerfile.cross
+
+# Temporary files
+tmp/
+.tmp/
+temp/
+
+# Build outputs
+manager
+controller-gen
+kustomize
+
+# Local development
+.local/
+local/
+
+# Node modules (if using any JS/TS tooling)
+node_modules/
+
+# Archives
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+
+# JetBrains
+*.iml
+*.ipr
+*.iws
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# Local configuration files
+config/local/
+*.local.yaml
+*.local.yml
+
+# Test outputs
+testbin/
