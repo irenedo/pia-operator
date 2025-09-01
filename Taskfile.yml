@@ -1,0 +1,115 @@
+version: '3'
+
+tasks:
+  tidy:
+    desc: Run go mod tidy.
+    cmds:
+      - go mod tidy
+
+  lint:
+    desc: Run golangci-lint against code.
+    cmds:
+      - golangci-lint run
+
+  fmt:
+    desc: Run go fmt against code.
+    cmds:
+      - go fmt ./...
+
+  build:
+    desc: Build manager binary.
+    cmds:
+      - task: deps
+      - task: fmt
+      - task: test
+      - task: lint
+      - go build -o bin/pia-operator main.go
+
+  check:
+    desc: Build manager binary.
+    cmds:
+      - task: deps
+      - task: fmt
+      - task: test
+      - task: lint
+
+  run:
+    desc: Run a controller from your host.
+    cmds:
+      - go run ./main.go --aws-region={{.AWS_REGION | default "eu-west-1"}} --cluster-name={{.CLUSTER_NAME | default "my-cluster"}}
+
+  docker-build:
+    desc: Build docker image with the manager.
+    cmds:
+      - docker build -t {{.IMG | default "pia-operator:latest"}} .
+
+  docker-push:
+    desc: Push docker image with the manager.
+    cmds:
+      - docker push {{.IMG | default "pia-operator:latest"}}
+
+  install:
+    desc: Install manifests into the K8s cluster specified in ~/.kube/config.
+    cmds:
+      - kubectl apply -f config/
+
+  uninstall:
+    desc: Uninstall manifests from the K8s cluster specified in ~/.kube/config.
+    cmds:
+      - kubectl delete -f config/ --ignore-not-found={{.IGNORE_NOT_FOUND | default "false"}}
+
+  deploy:
+    desc: Deploy controller to the K8s cluster specified in ~/.kube/config.
+    cmds:
+      - cd config/manager && kustomize edit set image controller={{.IMG | default "pia-operator:latest"}}
+      - kubectl apply -k config/default
+
+  undeploy:
+    desc: Undeploy controller from the K8s cluster specified in ~/.kube/config.
+    cmds:
+      - kubectl delete -k config/default --ignore-not-found={{.IGNORE_NOT_FOUND | default "false"}}
+
+  test:
+    desc: Run all unit tests
+    cmds:
+      - go test -v ./...
+
+  test-errors:
+    desc: Run unit tests for errors package
+    cmds:
+      - cd internal/errors && go test -v
+
+  test-coverage:
+    desc: Run tests with coverage report
+    cmds:
+      - go test -v -cover ./...
+
+  test-coverage-html:
+    desc: Run tests with HTML coverage report
+    cmds:
+      - go test -coverprofile=coverage.out ./...
+      - go tool cover -html=coverage.out -o coverage.html
+      - echo "Coverage report generated at coverage.html"
+
+  clean:
+    desc: Clean build artifacts and test files
+    cmds:
+      - rm -rf bin/
+      - rm -f coverage.out coverage.html
+
+  mocks:
+    desc: Generate mocks using mockery
+    cmds:
+      - mockery --config=.mockery.yaml
+
+  install-tools:
+    desc: Install development tools
+    cmds:
+      - go install github.com/vektra/mockery/v2@latest
+      - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+  deps:
+    desc: Download dependencies
+    cmds:
+      - go mod tidy
+      - go mod download

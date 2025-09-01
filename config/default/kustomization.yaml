@@ -1,0 +1,12 @@
+namespace: pia-operator-system
+
+namePrefix: pia-operator-
+
+resources:
+- ../rbac
+- ../manager
+
+images:
+- name: controller
+  newName: pia-operator
+  newTag: latest
