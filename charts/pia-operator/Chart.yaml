@@ -1,0 +1,21 @@
+apiVersion: v2
+name: pia-operator
+description: A Kubernetes operator that manages AWS Pod Identity Associations based on service account annotations
+type: application
+version: 0.1.0
+appVersion: "latest"
+home: https://github.com/irenedo/pia-operator
+sources:
+  - https://github.com/irenedo/pia-operator
+maintainers:
+  - name: Ivan Renedo
+    email: renedo@gmail.com
+keywords:
+  - kubernetes
+  - operator
+  - aws
+  - pod-identity
+  - eks
+  - iam
+annotations:
+  category: Infrastructure

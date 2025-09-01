@@ -1,0 +1,25 @@
+all: false
+force-file-write: true
+formatter: goimports
+log-level: info
+structname: '{{.Mock}}{{.InterfaceName}}'
+pkgname: '{{.SrcPackageName}}'
+recursive: false
+template: testify
+filename: '{{.InterfaceName}}_mock.go'
+packages:
+  github.com/irenedo/pia-operator/pkg/awsclient:
+    config:
+      dir: pkg/awsclient/mocks
+    interfaces:
+      AWSClient:
+  github.com/irenedo/pia-operator/pkg/errors:
+    config:
+      dir: pkg/errors/mocks
+    interfaces:
+      ErrorHandlerInterface:
+  github.com/irenedo/pia-operator/pkg/k8sclient:
+    config:
+      dir: pkg/k8sclient/mocks
+    interfaces:
+      Cli:

@@ -1,0 +1,84 @@
+operator:
+  aws:
+    region: "eu-west-1"
+  
+  clusterName: ""
+  
+  metricsBindAddress: ":8080"
+  healthProbeBindAddress: ":8081"
+  
+  devMode: false
+  
+  leaderElection: false
+
+image:
+  repository: renedo/pia-operator
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+deployment:
+  replicas: 1
+  
+  podAnnotations: {}
+  
+  podSecurityContext:
+    runAsNonRoot: true
+
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - "ALL"
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 128Mi
+    requests:
+      cpu: 10m
+      memory: 64Mi
+  
+  livenessProbe:
+    httpGet:
+      path: /healthz
+      port: 8081
+    initialDelaySeconds: 15
+    periodSeconds: 20
+  
+  readinessProbe:
+    httpGet:
+      path: /readyz
+      port: 8081
+    initialDelaySeconds: 5
+    periodSeconds: 10
+  
+  nodeSelector: {}
+  
+  tolerations: []
+  
+  affinity: {}
+  
+  terminationGracePeriodSeconds: 10
+
+rbac:
+  create: true
+  
+  annotations: {}
+
+namespace:
+  create: false
+  name: ""
+  annotations: {}
+  labels: {}
+
+commonLabels: {}
+
+nameOverride: ""
+fullnameOverride: ""
