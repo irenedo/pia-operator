@@ -196,6 +196,7 @@ The operator responds to the following annotations on ServiceAccount resources:
 ### Optional Annotations
 
 - `pia-operator.eks.aws.com/assume-role`: The ARN of an AWS IAM role to assume. When set, this role will be used instead of the base role.
+- `pia-operator.eks.aws.com/tagging`: Boolean value to control session tags (default: `true`). Set to `false` to disable session tags in the Pod Identity Association.
 
 ## Usage Examples
 
@@ -275,6 +276,20 @@ metadata:
     pia-operator.eks.aws.com/role: "arn:aws:iam::111111111111:role/BaseRole"
     # Role to assume in different account
     pia-operator.eks.aws.com/assume-role: "arn:aws:iam::222222222222:role/CrossAccountRole"
+```
+
+### Disabling Session Tags
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: no-session-tags-sa
+  namespace: default
+  annotations:
+    pia-operator.eks.aws.com/role: "arn:aws:iam::123456789012:role/MyPodRole"
+    # Disable session tags for this association
+    pia-operator.eks.aws.com/tagging: "false"
 ```
 
 ## Monitoring and Metrics

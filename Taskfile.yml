@@ -19,10 +19,7 @@ tasks:
   build:
     desc: Build manager binary.
     cmds:
-      - task: deps
-      - task: fmt
-      - task: test
-      - task: lint
+      - task: check
       - go build -o bin/pia-operator main.go
 
   check:
@@ -30,6 +27,7 @@ tasks:
     cmds:
       - task: deps
       - task: fmt
+      - task: mocks
       - task: test
       - task: lint
 
@@ -105,7 +103,7 @@ tasks:
   install-tools:
     desc: Install development tools
     cmds:
-      - go install github.com/vektra/mockery/v2@latest
+      - go install github.com/vektra/mockery/v3@latest
       - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
   deps:

@@ -8,6 +8,7 @@
 // The reconciler watches for ServiceAccounts with the following annotations:
 //   - pia-operator.eks.aws.com/role: Specifies the AWS IAM role ARN to associate.
 //   - pia-operator.eks.aws.com/assume-role: (Optional) Specifies a target role ARN for role assumption.
+//   - pia-operator.eks.aws.com/tagging: (Optional) Boolean to control session tags (default: true).
 //
 // When a ServiceAccount is annotated, the controller:
 //   - Adds a finalizer to ensure cleanup on deletion.
@@ -46,6 +47,7 @@ const (
 	// Annotations for Pod Identity Association
 	PodIdentityAssociationRoleAnnotation       = "pia-operator.eks.aws.com/role"
 	PodIdentityAssociationAssumeRoleAnnotation = "pia-operator.eks.aws.com/assume-role"
+	PodIdentityAssociationTaggingAnnotation    = "pia-operator.eks.aws.com/tagging"
 
 	// Finalizer for cleanup
 	PodIdentityAssociationFinalizer = "pia-operator.eks.aws.com/finalizer"
@@ -101,6 +103,8 @@ func (r *ServiceAccountReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	// Check if relevant annotations exist
 	roleArn, hasRoleArn := serviceAccount.Annotations[PodIdentityAssociationRoleAnnotation]
 	assumeRoleArn := serviceAccount.Annotations[PodIdentityAssociationAssumeRoleAnnotation]
+	// Default tagging to true, only disable if explicitly set to "false"
+	taggingEnabled := serviceAccount.Annotations[PodIdentityAssociationTaggingAnnotation] != "false"
 
 	if !hasRoleArn {
 		// No relevant annotations, ensure any existing association is cleaned up
@@ -117,13 +121,13 @@ func (r *ServiceAccountReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	}
 
 	// Create or update Pod Identity Association
-	return r.reconcilePodIdentityAssociation(ctx, serviceAccount, roleArn, assumeRoleArn)
+	return r.reconcilePodIdentityAssociation(ctx, serviceAccount, roleArn, assumeRoleArn, taggingEnabled)
 }
 
 // reconcilePodIdentityAssociation creates or updates a Pod Identity Association in AWS EKS
 // for the given ServiceAccount, establishing the connection between the Kubernetes ServiceAccount
 // and the specified IAM role ARN to enable pod-level IAM permissions.
-func (r *ServiceAccountReconciler) reconcilePodIdentityAssociation(ctx context.Context, sa *corev1.ServiceAccount, roleArn, assumeRoleArn string) (ctrl.Result, error) {
+func (r *ServiceAccountReconciler) reconcilePodIdentityAssociation(ctx context.Context, sa *corev1.ServiceAccount, roleArn, assumeRoleArn string, taggingEnabled bool) (ctrl.Result, error) {
 	log := r.Log.WithValues("serviceaccount", sa.Name, "namespace", sa.Namespace)
 
 	exists, err := r.AWSClient.AssociationExists(ctx, sa)
@@ -134,10 +138,10 @@ func (r *ServiceAccountReconciler) reconcilePodIdentityAssociation(ctx context.C
 	var associationID string
 	var op string
 	if exists {
-		associationID, err = r.updatePodIdentityAssociation(ctx, sa, roleArn, assumeRoleArn, log)
+		associationID, err = r.updatePodIdentityAssociation(ctx, sa, roleArn, assumeRoleArn, taggingEnabled, log)
 		op = "update"
 	} else {
-		associationID, err = r.createPodIdentityAssociation(ctx, sa, roleArn, assumeRoleArn, log)
+		associationID, err = r.createPodIdentityAssociation(ctx, sa, roleArn, assumeRoleArn, taggingEnabled, log)
 		op = "create"
 	}
 	if err != nil {
@@ -166,8 +170,8 @@ func (r *ServiceAccountReconciler) reconcilePodIdentityAssociation(ctx context.C
 // updatePodIdentityAssociation updates an existing Pod Identity Association in AWS EKS
 // with new role ARN configuration, ensuring the ServiceAccount maintains proper
 // IAM role binding while preserving the existing association ID.
-func (r *ServiceAccountReconciler) updatePodIdentityAssociation(ctx context.Context, sa *corev1.ServiceAccount, roleArn, assumeRoleArn string, log logr.Logger) (string, error) {
-	associationID, err := r.AWSClient.UpdatePodIdentityAssociation(ctx, sa, roleArn, assumeRoleArn)
+func (r *ServiceAccountReconciler) updatePodIdentityAssociation(ctx context.Context, sa *corev1.ServiceAccount, roleArn, assumeRoleArn string, taggingEnabled bool, log logr.Logger) (string, error) {
+	associationID, err := r.AWSClient.UpdatePodIdentityAssociation(ctx, sa, roleArn, assumeRoleArn, taggingEnabled)
 	if err != nil {
 		result, handleErr := r.errorHandler.HandleError(ctx, sa, err, "update Pod Identity Association")
 		if handleErr != nil {
@@ -183,8 +187,8 @@ func (r *ServiceAccountReconciler) updatePodIdentityAssociation(ctx context.Cont
 
 // createPodIdentityAssociation creates a new Pod Identity Association in AWS EKS
 // linking the ServiceAccount to the specified IAM role ARN.
-func (r *ServiceAccountReconciler) createPodIdentityAssociation(ctx context.Context, sa *corev1.ServiceAccount, roleArn, assumeRoleArn string, log logr.Logger) (string, error) {
-	associationID, err := r.AWSClient.CreatePodIdentityAssociation(ctx, sa, roleArn, assumeRoleArn)
+func (r *ServiceAccountReconciler) createPodIdentityAssociation(ctx context.Context, sa *corev1.ServiceAccount, roleArn, assumeRoleArn string, taggingEnabled bool, log logr.Logger) (string, error) {
+	associationID, err := r.AWSClient.CreatePodIdentityAssociation(ctx, sa, roleArn, assumeRoleArn, taggingEnabled)
 	if err != nil {
 		result, handleErr := r.errorHandler.HandleError(ctx, sa, err, "create Pod Identity Association")
 		if handleErr != nil {
@@ -241,6 +245,7 @@ func (r *ServiceAccountReconciler) deletePodIdentityAssociation(ctx context.Cont
 	if sa.Annotations != nil {
 		delete(sa.Annotations, PodIdentityAssociationAssumeRoleAnnotation)
 		delete(sa.Annotations, PodIdentityAssociationIDAnnotation)
+		delete(sa.Annotations, PodIdentityAssociationTaggingAnnotation)
 		if err := r.K8sClient.UpdateServiceAccount(ctx, sa); err != nil {
 			log.Error(err, "Failed to remove Pod Identity Association annotations from ServiceAccount")
 			return err
@@ -285,7 +290,9 @@ func (r *ServiceAccountReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				newRoleArn := e.ObjectNew.GetAnnotations()[PodIdentityAssociationRoleAnnotation]
 				oldAssumeRoleArn := e.ObjectOld.GetAnnotations()[PodIdentityAssociationAssumeRoleAnnotation]
 				newAssumeRoleArn := e.ObjectNew.GetAnnotations()[PodIdentityAssociationAssumeRoleAnnotation]
-				return oldRoleArn != newRoleArn || oldAssumeRoleArn != newAssumeRoleArn
+				oldTagging := e.ObjectOld.GetAnnotations()[PodIdentityAssociationTaggingAnnotation]
+				newTagging := e.ObjectNew.GetAnnotations()[PodIdentityAssociationTaggingAnnotation]
+				return oldRoleArn != newRoleArn || oldAssumeRoleArn != newAssumeRoleArn || oldTagging != newTagging
 			},
 			CreateFunc: func(e event.CreateEvent) bool {
 				annotations := e.Object.GetAnnotations()
