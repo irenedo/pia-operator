@@ -25,8 +25,8 @@ import (
 
 // AWSClient interface for Pod Identity operations (consolidated)
 type AWSClient interface {
-	CreatePodIdentityAssociation(ctx context.Context, sa *corev1.ServiceAccount, roleArn, assumeRoleArn string) (string, error)
-	UpdatePodIdentityAssociation(ctx context.Context, sa *corev1.ServiceAccount, roleArn, assumeRoleArn string) (string, error)
+	CreatePodIdentityAssociation(ctx context.Context, sa *corev1.ServiceAccount, roleArn, assumeRoleArn string, taggingEnabled bool) (string, error)
+	UpdatePodIdentityAssociation(ctx context.Context, sa *corev1.ServiceAccount, roleArn, assumeRoleArn string, taggingEnabled bool) (string, error)
 	DeletePodIdentityAssociation(ctx context.Context, sa *corev1.ServiceAccount) error
 	AssociationExists(ctx context.Context, sa *corev1.ServiceAccount) (bool, error)
 	GetPodIdentityAssociation(ctx context.Context, sa *corev1.ServiceAccount) (*PodIdentityAssociation, error)

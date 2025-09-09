@@ -43,9 +43,9 @@ var _ = Describe("AWSClient", func() {
 				roleArn := "arn:aws:iam::123456789012:role/test-role"
 				assumeRoleArn := "arn:aws:iam::123456789012:role/assume-role"
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, assumeRoleArn).Return(expectedAssociationID, nil)
+				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, assumeRoleArn, true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, assumeRoleArn)
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, assumeRoleArn, true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -56,9 +56,9 @@ var _ = Describe("AWSClient", func() {
 				expectedAssociationID := "a-12345"
 				roleArn := "arn:aws:iam::123456789012:role/test-role"
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, "").Return(expectedAssociationID, nil)
+				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, "", true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, "")
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, "", true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -70,9 +70,9 @@ var _ = Describe("AWSClient", func() {
 				roleArn := "arn:aws:iam::123456789012:role/base-role"
 				emptyAssumeRole := ""
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, emptyAssumeRole).Return(expectedAssociationID, nil)
+				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, emptyAssumeRole, true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, emptyAssumeRole)
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, emptyAssumeRole, true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -92,9 +92,9 @@ var _ = Describe("AWSClient", func() {
 					},
 				}
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccountWithAnnotations, roleArn, "").Return(expectedAssociationID, nil)
+				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccountWithAnnotations, roleArn, "", true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccountWithAnnotations, roleArn, "")
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccountWithAnnotations, roleArn, "", true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -112,9 +112,9 @@ var _ = Describe("AWSClient", func() {
 					},
 				}
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccountNilAnnotations, roleArn, "").Return(expectedAssociationID, nil)
+				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccountNilAnnotations, roleArn, "", true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccountNilAnnotations, roleArn, "")
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccountNilAnnotations, roleArn, "", true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -132,9 +132,9 @@ var _ = Describe("AWSClient", func() {
 					},
 				}
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, differentNamespaceSA, roleArn, "").Return(expectedAssociationID, nil)
+				mockClient.On("CreatePodIdentityAssociation", ctx, differentNamespaceSA, roleArn, "", true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, differentNamespaceSA, roleArn, "")
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, differentNamespaceSA, roleArn, "", true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -147,9 +147,9 @@ var _ = Describe("AWSClient", func() {
 				roleArn := "arn:aws:iam::123456789012:role/test-role"
 				expectedError := errors.New("AWS API error")
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, "").Return("", expectedError)
+				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, "", true).Return("", expectedError)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, "")
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, "", true)
 
 				Expect(err).To(Equal(expectedError))
 				Expect(associationID).To(BeEmpty())
@@ -160,9 +160,9 @@ var _ = Describe("AWSClient", func() {
 				roleArn := "arn:aws:iam::123456789012:role/existing-role"
 				alreadyExistsError := errors.New("ResourceInUseException: Association already exists")
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, "").Return("", alreadyExistsError)
+				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, "", true).Return("", alreadyExistsError)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, "")
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, "", true)
 
 				Expect(err).To(Equal(alreadyExistsError))
 				Expect(associationID).To(BeEmpty())
@@ -175,9 +175,9 @@ var _ = Describe("AWSClient", func() {
 					Message: aws.String("Cluster not found"),
 				}
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, "").Return("", clusterNotFoundError)
+				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, "", true).Return("", clusterNotFoundError)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, "")
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, "", true)
 
 				Expect(err).To(Equal(clusterNotFoundError))
 				Expect(associationID).To(BeEmpty())
@@ -188,9 +188,9 @@ var _ = Describe("AWSClient", func() {
 				invalidRoleArn := "invalid-role-arn"
 				invalidParameterError := errors.New("InvalidParameterException: Invalid role ARN")
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, invalidRoleArn, "").Return("", invalidParameterError)
+				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, invalidRoleArn, "", true).Return("", invalidParameterError)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, invalidRoleArn, "")
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, invalidRoleArn, "", true)
 
 				Expect(err).To(Equal(invalidParameterError))
 				Expect(associationID).To(BeEmpty())
@@ -202,9 +202,9 @@ var _ = Describe("AWSClient", func() {
 				invalidAssumeRoleArn := "invalid-assume-role-arn"
 				invalidAssumeRoleError := errors.New("InvalidParameterException: Invalid target role ARN")
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, invalidAssumeRoleArn).Return("", invalidAssumeRoleError)
+				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, invalidAssumeRoleArn, true).Return("", invalidAssumeRoleError)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, invalidAssumeRoleArn)
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, invalidAssumeRoleArn, true)
 
 				Expect(err).To(Equal(invalidAssumeRoleError))
 				Expect(associationID).To(BeEmpty())
@@ -215,9 +215,9 @@ var _ = Describe("AWSClient", func() {
 				roleArn := "arn:aws:iam::123456789012:role/test-role"
 				unauthorizedError := errors.New("UnauthorizedOperation: Access denied")
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, "").Return("", unauthorizedError)
+				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, "", true).Return("", unauthorizedError)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, "")
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, "", true)
 
 				Expect(err).To(Equal(unauthorizedError))
 				Expect(associationID).To(BeEmpty())
@@ -228,9 +228,9 @@ var _ = Describe("AWSClient", func() {
 				roleArn := "arn:aws:iam::123456789012:role/test-role"
 				serviceLimitError := errors.New("ServiceLimitExceededException: Service limit exceeded")
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, "").Return("", serviceLimitError)
+				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, "", true).Return("", serviceLimitError)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, "")
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, "", true)
 
 				Expect(err).To(Equal(serviceLimitError))
 				Expect(associationID).To(BeEmpty())
@@ -241,9 +241,9 @@ var _ = Describe("AWSClient", func() {
 				roleArn := "arn:aws:iam::123456789012:role/test-role"
 				cancelledError := context.Canceled
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, "").Return("", cancelledError)
+				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, "", true).Return("", cancelledError)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, "")
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, "", true)
 
 				Expect(err).To(Equal(cancelledError))
 				Expect(associationID).To(BeEmpty())
@@ -254,9 +254,9 @@ var _ = Describe("AWSClient", func() {
 				roleArn := "arn:aws:iam::123456789012:role/test-role"
 				timeoutError := context.DeadlineExceeded
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, "").Return("", timeoutError)
+				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, "", true).Return("", timeoutError)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, "")
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, "", true)
 
 				Expect(err).To(Equal(timeoutError))
 				Expect(associationID).To(BeEmpty())
@@ -276,9 +276,9 @@ var _ = Describe("AWSClient", func() {
 					},
 				}
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, longNameSA, roleArn, "").Return(expectedAssociationID, nil)
+				mockClient.On("CreatePodIdentityAssociation", ctx, longNameSA, roleArn, "", true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, longNameSA, roleArn, "")
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, longNameSA, roleArn, "", true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -296,9 +296,9 @@ var _ = Describe("AWSClient", func() {
 					},
 				}
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, specialCharsSA, roleArn, "").Return(expectedAssociationID, nil)
+				mockClient.On("CreatePodIdentityAssociation", ctx, specialCharsSA, roleArn, "", true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, specialCharsSA, roleArn, "")
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, specialCharsSA, roleArn, "", true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -309,9 +309,9 @@ var _ = Describe("AWSClient", func() {
 				expectedAssociationID := "a-cross-account"
 				crossAccountRoleArn := "arn:aws:iam::987654321098:role/cross-account-role"
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, crossAccountRoleArn, "").Return(expectedAssociationID, nil)
+				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, crossAccountRoleArn, "", true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, crossAccountRoleArn, "")
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, crossAccountRoleArn, "", true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -323,9 +323,9 @@ var _ = Describe("AWSClient", func() {
 				roleArn := "arn:aws:iam::123456789012:role/base-role"
 				crossAccountAssumeRoleArn := "arn:aws:iam::987654321098:role/cross-account-assume-role"
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, crossAccountAssumeRoleArn).Return(expectedAssociationID, nil)
+				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleArn, crossAccountAssumeRoleArn, true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, crossAccountAssumeRoleArn)
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleArn, crossAccountAssumeRoleArn, true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -336,9 +336,9 @@ var _ = Describe("AWSClient", func() {
 				expectedAssociationID := "a-role-with-path"
 				roleWithPathArn := "arn:aws:iam::123456789012:role/path/to/role/test-role"
 
-				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleWithPathArn, "").Return(expectedAssociationID, nil)
+				mockClient.On("CreatePodIdentityAssociation", ctx, serviceAccount, roleWithPathArn, "", true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleWithPathArn, "")
+				associationID, err := mockClient.CreatePodIdentityAssociation(ctx, serviceAccount, roleWithPathArn, "", true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -354,9 +354,9 @@ var _ = Describe("AWSClient", func() {
 				roleArn := "arn:aws:iam::123456789012:role/updated-role"
 				assumeRoleArn := "arn:aws:iam::123456789012:role/updated-assume-role"
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, assumeRoleArn).Return(expectedAssociationID, nil)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, assumeRoleArn, true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, assumeRoleArn)
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, assumeRoleArn, true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -367,9 +367,9 @@ var _ = Describe("AWSClient", func() {
 				expectedAssociationID := "a-54321"
 				roleArn := "arn:aws:iam::123456789012:role/updated-role"
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, "").Return(expectedAssociationID, nil)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, "", true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, "", true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -381,9 +381,9 @@ var _ = Describe("AWSClient", func() {
 				roleArn := "arn:aws:iam::123456789012:role/base-updated-role"
 				emptyAssumeRole := ""
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, emptyAssumeRole).Return(expectedAssociationID, nil)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, emptyAssumeRole, true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, emptyAssumeRole)
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, emptyAssumeRole, true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -403,9 +403,9 @@ var _ = Describe("AWSClient", func() {
 					},
 				}
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccountWithID, roleArn, "").Return(expectedAssociationID, nil)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccountWithID, roleArn, "", true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccountWithID, roleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccountWithID, roleArn, "", true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -423,9 +423,9 @@ var _ = Describe("AWSClient", func() {
 					},
 				}
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccountNoID, roleArn, "").Return(expectedAssociationID, nil)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccountNoID, roleArn, "", true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccountNoID, roleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccountNoID, roleArn, "", true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -443,9 +443,9 @@ var _ = Describe("AWSClient", func() {
 					},
 				}
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, differentNamespaceSA, roleArn, "").Return(expectedAssociationID, nil)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, differentNamespaceSA, roleArn, "", true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, differentNamespaceSA, roleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, differentNamespaceSA, roleArn, "", true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -456,9 +456,9 @@ var _ = Describe("AWSClient", func() {
 				expectedAssociationID := "a-cross-account-update"
 				crossAccountRoleArn := "arn:aws:iam::987654321098:role/cross-account-updated-role"
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, crossAccountRoleArn, "").Return(expectedAssociationID, nil)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, crossAccountRoleArn, "", true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, crossAccountRoleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, crossAccountRoleArn, "", true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -470,9 +470,9 @@ var _ = Describe("AWSClient", func() {
 				roleArn := "arn:aws:iam::123456789012:role/base-role"
 				crossAccountAssumeRoleArn := "arn:aws:iam::987654321098:role/cross-account-updated-assume-role"
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, crossAccountAssumeRoleArn).Return(expectedAssociationID, nil)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, crossAccountAssumeRoleArn, true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, crossAccountAssumeRoleArn)
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, crossAccountAssumeRoleArn, true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -485,9 +485,9 @@ var _ = Describe("AWSClient", func() {
 				roleArn := "arn:aws:iam::123456789012:role/updated-role"
 				expectedError := errors.New("update failed")
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, "").Return("", expectedError)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, "", true).Return("", expectedError)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, "", true)
 
 				Expect(err).To(Equal(expectedError))
 				Expect(associationID).To(BeEmpty())
@@ -500,9 +500,9 @@ var _ = Describe("AWSClient", func() {
 					Message: aws.String("Association not found"),
 				}
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, "").Return("", notFoundError)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, "", true).Return("", notFoundError)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, "", true)
 
 				Expect(err).To(Equal(notFoundError))
 				Expect(associationID).To(BeEmpty())
@@ -515,9 +515,9 @@ var _ = Describe("AWSClient", func() {
 					Message: aws.String("Cluster not found"),
 				}
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, "").Return("", clusterNotFoundError)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, "", true).Return("", clusterNotFoundError)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, "", true)
 
 				Expect(err).To(Equal(clusterNotFoundError))
 				Expect(associationID).To(BeEmpty())
@@ -528,9 +528,9 @@ var _ = Describe("AWSClient", func() {
 				invalidRoleArn := "invalid-updated-role-arn"
 				invalidParameterError := errors.New("InvalidParameterException: Invalid role ARN")
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, invalidRoleArn, "").Return("", invalidParameterError)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, invalidRoleArn, "", true).Return("", invalidParameterError)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, invalidRoleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, invalidRoleArn, "", true)
 
 				Expect(err).To(Equal(invalidParameterError))
 				Expect(associationID).To(BeEmpty())
@@ -542,9 +542,9 @@ var _ = Describe("AWSClient", func() {
 				invalidAssumeRoleArn := "invalid-updated-assume-role-arn"
 				invalidAssumeRoleError := errors.New("InvalidParameterException: Invalid target role ARN")
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, invalidAssumeRoleArn).Return("", invalidAssumeRoleError)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, invalidAssumeRoleArn, true).Return("", invalidAssumeRoleError)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, invalidAssumeRoleArn)
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, invalidAssumeRoleArn, true)
 
 				Expect(err).To(Equal(invalidAssumeRoleError))
 				Expect(associationID).To(BeEmpty())
@@ -555,9 +555,9 @@ var _ = Describe("AWSClient", func() {
 				roleArn := "arn:aws:iam::123456789012:role/updated-role"
 				unauthorizedError := errors.New("UnauthorizedOperation: Access denied")
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, "").Return("", unauthorizedError)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, "", true).Return("", unauthorizedError)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, "", true)
 
 				Expect(err).To(Equal(unauthorizedError))
 				Expect(associationID).To(BeEmpty())
@@ -568,9 +568,9 @@ var _ = Describe("AWSClient", func() {
 				roleArn := "arn:aws:iam::123456789012:role/updated-role"
 				invalidStateError := errors.New("InvalidRequestException: Association is in invalid state")
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, "").Return("", invalidStateError)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, "", true).Return("", invalidStateError)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, "", true)
 
 				Expect(err).To(Equal(invalidStateError))
 				Expect(associationID).To(BeEmpty())
@@ -581,9 +581,9 @@ var _ = Describe("AWSClient", func() {
 				roleArn := "arn:aws:iam::123456789012:role/updated-role"
 				cancelledError := context.Canceled
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, "").Return("", cancelledError)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, "", true).Return("", cancelledError)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, "", true)
 
 				Expect(err).To(Equal(cancelledError))
 				Expect(associationID).To(BeEmpty())
@@ -594,9 +594,9 @@ var _ = Describe("AWSClient", func() {
 				roleArn := "arn:aws:iam::123456789012:role/updated-role"
 				timeoutError := context.DeadlineExceeded
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, "").Return("", timeoutError)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, "", true).Return("", timeoutError)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, "", true)
 
 				Expect(err).To(Equal(timeoutError))
 				Expect(associationID).To(BeEmpty())
@@ -614,9 +614,9 @@ var _ = Describe("AWSClient", func() {
 				}
 				lookupError := errors.New("failed to find existing association")
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccountNoID, roleArn, "").Return("", lookupError)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccountNoID, roleArn, "", true).Return("", lookupError)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccountNoID, roleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccountNoID, roleArn, "", true)
 
 				Expect(err).To(Equal(lookupError))
 				Expect(associationID).To(BeEmpty())
@@ -636,9 +636,9 @@ var _ = Describe("AWSClient", func() {
 					},
 				}
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, longNameSA, roleArn, "").Return(expectedAssociationID, nil)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, longNameSA, roleArn, "", true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, longNameSA, roleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, longNameSA, roleArn, "", true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -656,9 +656,9 @@ var _ = Describe("AWSClient", func() {
 					},
 				}
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, specialCharsSA, roleArn, "").Return(expectedAssociationID, nil)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, specialCharsSA, roleArn, "", true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, specialCharsSA, roleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, specialCharsSA, roleArn, "", true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -669,9 +669,9 @@ var _ = Describe("AWSClient", func() {
 				expectedAssociationID := "a-role-path-update"
 				roleWithPathArn := "arn:aws:iam::123456789012:role/path/to/updated/role/test-role"
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleWithPathArn, "").Return(expectedAssociationID, nil)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleWithPathArn, "", true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleWithPathArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleWithPathArn, "", true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -691,9 +691,9 @@ var _ = Describe("AWSClient", func() {
 					},
 				}
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccountEmptyID, roleArn, "").Return(expectedAssociationID, nil)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccountEmptyID, roleArn, "", true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccountEmptyID, roleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccountEmptyID, roleArn, "", true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))
@@ -704,9 +704,9 @@ var _ = Describe("AWSClient", func() {
 				roleArn := "arn:aws:iam::123456789012:role/concurrent-updated-role"
 				concurrentError := errors.New("ConflictException: Association is being modified")
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, "").Return("", concurrentError)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccount, roleArn, "", true).Return("", concurrentError)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccount, roleArn, "", true)
 
 				Expect(err).To(Equal(concurrentError))
 				Expect(associationID).To(BeEmpty())
@@ -724,9 +724,9 @@ var _ = Describe("AWSClient", func() {
 					},
 				}
 
-				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccountNilAnnotations, roleArn, "").Return(expectedAssociationID, nil)
+				mockClient.On("UpdatePodIdentityAssociation", ctx, serviceAccountNilAnnotations, roleArn, "", true).Return(expectedAssociationID, nil)
 
-				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccountNilAnnotations, roleArn, "")
+				associationID, err := mockClient.UpdatePodIdentityAssociation(ctx, serviceAccountNilAnnotations, roleArn, "", true)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(associationID).To(Equal(expectedAssociationID))

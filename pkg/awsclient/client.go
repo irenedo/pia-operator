@@ -46,14 +46,15 @@ func NewClient(ctx context.Context, clusterName, region string, log logr.Logger)
 // CreatePodIdentityAssociation creates a new AWS EKS Pod Identity Association that allows
 // a Kubernetes ServiceAccount to assume an IAM role without long-lived credentials.
 // Returns the association ID which is stored in the ServiceAccount's annotations.
-func (c *Client) CreatePodIdentityAssociation(ctx context.Context, sa *corev1.ServiceAccount, roleArn, assumeRoleArn string) (string, error) {
+func (c *Client) CreatePodIdentityAssociation(ctx context.Context, sa *corev1.ServiceAccount, roleArn, assumeRoleArn string, taggingEnabled bool) (string, error) {
 	log := c.log.WithValues("serviceaccount", sa.Name, "namespace", sa.Namespace, "operation", "create")
 
 	input := &eks.CreatePodIdentityAssociationInput{
-		ClusterName:    aws.String(c.clusterName),
-		Namespace:      aws.String(sa.Namespace),
-		ServiceAccount: aws.String(sa.Name),
-		RoleArn:        aws.String(roleArn), // Base role always goes to RoleArn
+		ClusterName:        aws.String(c.clusterName),
+		Namespace:          aws.String(sa.Namespace),
+		ServiceAccount:     aws.String(sa.Name),
+		RoleArn:            aws.String(roleArn),       // Base role always goes to RoleArn
+		DisableSessionTags: aws.Bool(!taggingEnabled), // If tagging is disabled, disable session tags
 		Tags: map[string]string{
 			"managed-by":     "pia-operator",
 			"serviceaccount": sa.Name,
@@ -90,7 +91,7 @@ func (c *Client) CreatePodIdentityAssociation(ctx context.Context, sa *corev1.Se
 // UpdatePodIdentityAssociation updates an existing AWS EKS Pod Identity Association with new role ARNs.
 // It finds the association by ID from ServiceAccount annotations or by searching all associations.
 // Returns the association ID after successful update.
-func (c *Client) UpdatePodIdentityAssociation(ctx context.Context, sa *corev1.ServiceAccount, roleArn, assumeRoleArn string) (string, error) {
+func (c *Client) UpdatePodIdentityAssociation(ctx context.Context, sa *corev1.ServiceAccount, roleArn, assumeRoleArn string, taggingEnabled bool) (string, error) {
 	log := c.log.WithValues("serviceaccount", sa.Name, "namespace", sa.Namespace, "operation", "update")
 
 	// Get the existing association ID
@@ -105,9 +106,10 @@ func (c *Client) UpdatePodIdentityAssociation(ctx context.Context, sa *corev1.Se
 	}
 
 	input := &eks.UpdatePodIdentityAssociationInput{
-		ClusterName:   aws.String(c.clusterName),
-		AssociationId: aws.String(associationID),
-		RoleArn:       aws.String(roleArn), // Base role always goes to RoleArn
+		ClusterName:        aws.String(c.clusterName),
+		AssociationId:      aws.String(associationID),
+		RoleArn:            aws.String(roleArn),       // Base role always goes to RoleArn
+		DisableSessionTags: aws.Bool(!taggingEnabled), // If tagging is disabled, disable session tags
 	}
 
 	// Set target role if assume role is provided

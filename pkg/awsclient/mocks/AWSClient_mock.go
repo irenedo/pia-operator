@@ -106,8 +106,8 @@ func (_c *MockAWSClient_AssociationExists_Call) RunAndReturn(run func(ctx contex
 }
 
 // CreatePodIdentityAssociation provides a mock function for the type MockAWSClient
-func (_mock *MockAWSClient) CreatePodIdentityAssociation(ctx context.Context, sa *v1.ServiceAccount, roleArn string, assumeRoleArn string) (string, error) {
-	ret := _mock.Called(ctx, sa, roleArn, assumeRoleArn)
+func (_mock *MockAWSClient) CreatePodIdentityAssociation(ctx context.Context, sa *v1.ServiceAccount, roleArn string, assumeRoleArn string, taggingEnabled bool) (string, error) {
+	ret := _mock.Called(ctx, sa, roleArn, assumeRoleArn, taggingEnabled)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreatePodIdentityAssociation")
@@ -115,16 +115,16 @@ func (_mock *MockAWSClient) CreatePodIdentityAssociation(ctx context.Context, sa
 
 	var r0 string
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *v1.ServiceAccount, string, string) (string, error)); ok {
-		return returnFunc(ctx, sa, roleArn, assumeRoleArn)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *v1.ServiceAccount, string, string, bool) (string, error)); ok {
+		return returnFunc(ctx, sa, roleArn, assumeRoleArn, taggingEnabled)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *v1.ServiceAccount, string, string) string); ok {
-		r0 = returnFunc(ctx, sa, roleArn, assumeRoleArn)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *v1.ServiceAccount, string, string, bool) string); ok {
+		r0 = returnFunc(ctx, sa, roleArn, assumeRoleArn, taggingEnabled)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *v1.ServiceAccount, string, string) error); ok {
-		r1 = returnFunc(ctx, sa, roleArn, assumeRoleArn)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *v1.ServiceAccount, string, string, bool) error); ok {
+		r1 = returnFunc(ctx, sa, roleArn, assumeRoleArn, taggingEnabled)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -141,11 +141,12 @@ type MockAWSClient_CreatePodIdentityAssociation_Call struct {
 //   - sa *v1.ServiceAccount
 //   - roleArn string
 //   - assumeRoleArn string
-func (_e *MockAWSClient_Expecter) CreatePodIdentityAssociation(ctx interface{}, sa interface{}, roleArn interface{}, assumeRoleArn interface{}) *MockAWSClient_CreatePodIdentityAssociation_Call {
-	return &MockAWSClient_CreatePodIdentityAssociation_Call{Call: _e.mock.On("CreatePodIdentityAssociation", ctx, sa, roleArn, assumeRoleArn)}
+//   - taggingEnabled bool
+func (_e *MockAWSClient_Expecter) CreatePodIdentityAssociation(ctx interface{}, sa interface{}, roleArn interface{}, assumeRoleArn interface{}, taggingEnabled interface{}) *MockAWSClient_CreatePodIdentityAssociation_Call {
+	return &MockAWSClient_CreatePodIdentityAssociation_Call{Call: _e.mock.On("CreatePodIdentityAssociation", ctx, sa, roleArn, assumeRoleArn, taggingEnabled)}
 }
 
-func (_c *MockAWSClient_CreatePodIdentityAssociation_Call) Run(run func(ctx context.Context, sa *v1.ServiceAccount, roleArn string, assumeRoleArn string)) *MockAWSClient_CreatePodIdentityAssociation_Call {
+func (_c *MockAWSClient_CreatePodIdentityAssociation_Call) Run(run func(ctx context.Context, sa *v1.ServiceAccount, roleArn string, assumeRoleArn string, taggingEnabled bool)) *MockAWSClient_CreatePodIdentityAssociation_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -163,11 +164,16 @@ func (_c *MockAWSClient_CreatePodIdentityAssociation_Call) Run(run func(ctx cont
 		if args[3] != nil {
 			arg3 = args[3].(string)
 		}
+		var arg4 bool
+		if args[4] != nil {
+			arg4 = args[4].(bool)
+		}
 		run(
 			arg0,
 			arg1,
 			arg2,
 			arg3,
+			arg4,
 		)
 	})
 	return _c
@@ -178,7 +184,7 @@ func (_c *MockAWSClient_CreatePodIdentityAssociation_Call) Return(s string, err 
 	return _c
 }
 
-func (_c *MockAWSClient_CreatePodIdentityAssociation_Call) RunAndReturn(run func(ctx context.Context, sa *v1.ServiceAccount, roleArn string, assumeRoleArn string) (string, error)) *MockAWSClient_CreatePodIdentityAssociation_Call {
+func (_c *MockAWSClient_CreatePodIdentityAssociation_Call) RunAndReturn(run func(ctx context.Context, sa *v1.ServiceAccount, roleArn string, assumeRoleArn string, taggingEnabled bool) (string, error)) *MockAWSClient_CreatePodIdentityAssociation_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -371,8 +377,8 @@ func (_c *MockAWSClient_ListPodIdentityAssociations_Call) RunAndReturn(run func(
 }
 
 // UpdatePodIdentityAssociation provides a mock function for the type MockAWSClient
-func (_mock *MockAWSClient) UpdatePodIdentityAssociation(ctx context.Context, sa *v1.ServiceAccount, roleArn string, assumeRoleArn string) (string, error) {
-	ret := _mock.Called(ctx, sa, roleArn, assumeRoleArn)
+func (_mock *MockAWSClient) UpdatePodIdentityAssociation(ctx context.Context, sa *v1.ServiceAccount, roleArn string, assumeRoleArn string, taggingEnabled bool) (string, error) {
+	ret := _mock.Called(ctx, sa, roleArn, assumeRoleArn, taggingEnabled)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdatePodIdentityAssociation")
@@ -380,16 +386,16 @@ func (_mock *MockAWSClient) UpdatePodIdentityAssociation(ctx context.Context, sa
 
 	var r0 string
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *v1.ServiceAccount, string, string) (string, error)); ok {
-		return returnFunc(ctx, sa, roleArn, assumeRoleArn)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *v1.ServiceAccount, string, string, bool) (string, error)); ok {
+		return returnFunc(ctx, sa, roleArn, assumeRoleArn, taggingEnabled)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *v1.ServiceAccount, string, string) string); ok {
-		r0 = returnFunc(ctx, sa, roleArn, assumeRoleArn)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *v1.ServiceAccount, string, string, bool) string); ok {
+		r0 = returnFunc(ctx, sa, roleArn, assumeRoleArn, taggingEnabled)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *v1.ServiceAccount, string, string) error); ok {
-		r1 = returnFunc(ctx, sa, roleArn, assumeRoleArn)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *v1.ServiceAccount, string, string, bool) error); ok {
+		r1 = returnFunc(ctx, sa, roleArn, assumeRoleArn, taggingEnabled)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -406,11 +412,12 @@ type MockAWSClient_UpdatePodIdentityAssociation_Call struct {
 //   - sa *v1.ServiceAccount
 //   - roleArn string
 //   - assumeRoleArn string
-func (_e *MockAWSClient_Expecter) UpdatePodIdentityAssociation(ctx interface{}, sa interface{}, roleArn interface{}, assumeRoleArn interface{}) *MockAWSClient_UpdatePodIdentityAssociation_Call {
-	return &MockAWSClient_UpdatePodIdentityAssociation_Call{Call: _e.mock.On("UpdatePodIdentityAssociation", ctx, sa, roleArn, assumeRoleArn)}
+//   - taggingEnabled bool
+func (_e *MockAWSClient_Expecter) UpdatePodIdentityAssociation(ctx interface{}, sa interface{}, roleArn interface{}, assumeRoleArn interface{}, taggingEnabled interface{}) *MockAWSClient_UpdatePodIdentityAssociation_Call {
+	return &MockAWSClient_UpdatePodIdentityAssociation_Call{Call: _e.mock.On("UpdatePodIdentityAssociation", ctx, sa, roleArn, assumeRoleArn, taggingEnabled)}
 }
 
-func (_c *MockAWSClient_UpdatePodIdentityAssociation_Call) Run(run func(ctx context.Context, sa *v1.ServiceAccount, roleArn string, assumeRoleArn string)) *MockAWSClient_UpdatePodIdentityAssociation_Call {
+func (_c *MockAWSClient_UpdatePodIdentityAssociation_Call) Run(run func(ctx context.Context, sa *v1.ServiceAccount, roleArn string, assumeRoleArn string, taggingEnabled bool)) *MockAWSClient_UpdatePodIdentityAssociation_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -428,11 +435,16 @@ func (_c *MockAWSClient_UpdatePodIdentityAssociation_Call) Run(run func(ctx cont
 		if args[3] != nil {
 			arg3 = args[3].(string)
 		}
+		var arg4 bool
+		if args[4] != nil {
+			arg4 = args[4].(bool)
+		}
 		run(
 			arg0,
 			arg1,
 			arg2,
 			arg3,
+			arg4,
 		)
 	})
 	return _c
@@ -443,7 +455,7 @@ func (_c *MockAWSClient_UpdatePodIdentityAssociation_Call) Return(s string, err 
 	return _c
 }
 
-func (_c *MockAWSClient_UpdatePodIdentityAssociation_Call) RunAndReturn(run func(ctx context.Context, sa *v1.ServiceAccount, roleArn string, assumeRoleArn string) (string, error)) *MockAWSClient_UpdatePodIdentityAssociation_Call {
+func (_c *MockAWSClient_UpdatePodIdentityAssociation_Call) RunAndReturn(run func(ctx context.Context, sa *v1.ServiceAccount, roleArn string, assumeRoleArn string, taggingEnabled bool) (string, error)) *MockAWSClient_UpdatePodIdentityAssociation_Call {
 	_c.Call.Return(run)
 	return _c
 }

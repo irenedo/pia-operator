@@ -12,7 +12,40 @@ env:
   IMAGE_NAME: renedo/pia-operator
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.25'
+        
+    - name: Install Task
+      uses: arduino/setup-task@v2
+      with:
+        version: 3.x
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Install development tools
+      run: task install-tools
+      
+    - name: Run comprehensive checks
+      run: task check
+      
+    - name: Upload coverage reports
+      if: success()
+      run: |
+        if [ -f coverage.out ]; then
+          echo "Coverage report found, uploading..."
+          # You can add coverage upload service here if needed
+        fi
+
   build-and-push-images:
+    needs: check
     runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
